@@ -1,7 +1,6 @@
 #pragma once
-
+#include <iostream>
 template <typename T>
-
 class LList {
 private:
     struct Node {
@@ -28,7 +27,7 @@ public:
     }
     
     //12.1
-    int LList<T>::count(int x)
+    int LList<T>::count(int x) const
     {
         int count = 0;
         Node* temp = first;
@@ -79,7 +78,7 @@ public:
     }
 
     //12.4
-    LList<T>::operator +=(const T& elem)
+    void LList<T>::operator +=(const T& elem)
     {
         push_back(elem);
     }
@@ -93,5 +92,20 @@ public:
             last = last->next;
         }
         last->next = other.first;
+    }
+
+    void print() const
+    {
+        if(first != nullptr)
+        {
+            Node *temp = first;
+            while (temp != nullptr)
+            {
+                std::cout << temp->data << " ";
+                temp = temp->next;
+            }
+            return;
+        }
+        cout << "List is empty!" << endl;
     }
 };
