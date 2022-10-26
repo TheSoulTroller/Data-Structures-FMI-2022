@@ -22,6 +22,14 @@ public:
     LList(){
         first = nullptr;
     }
+    LList(const LList& other){
+        first = nullptr;
+        Node* temp = other.first;
+        while(temp){
+            push_back(temp->data);
+            temp = temp->next;
+        }
+    }
     ~LLits(){
         erase();
     }
