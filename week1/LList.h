@@ -19,10 +19,10 @@ private:
     }
 
 public:
-    LList(){
+    LList<T>(){
         first = nullptr;
     }
-    LList(const LList& other){
+    LList<T>(const LList<T>& other){
         first = nullptr;
         Node* temp = other.first;
         while(temp){
@@ -30,7 +30,7 @@ public:
             temp = temp->next;
         }
     }
-    ~LLits(){
+    ~LLits<T>(){
         erase();
     }
     
