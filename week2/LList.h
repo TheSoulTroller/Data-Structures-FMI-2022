@@ -59,8 +59,14 @@ public:
         }
         
     }
+    
+    Iterator begin(){
+        return Iterator(first);
+    }
+    Iterator end(){
+        return Iterator(nullptr);
+    }
 
-    void
     LList<T>::push_back(const T &elem)
     {
         Node* newNode = new Node;
