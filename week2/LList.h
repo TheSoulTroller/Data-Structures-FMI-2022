@@ -54,6 +54,13 @@ public:
         void operator++(){
             current = current->next;
         }
+        void operator--(){
+            Node *temp = first
+            while(temp->next != current){
+                temp = temp->next;
+            }
+            current = temp;
+        }
         T &operator*(){
             return current->data;
         }
