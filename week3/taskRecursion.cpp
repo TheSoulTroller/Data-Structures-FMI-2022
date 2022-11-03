@@ -79,7 +79,7 @@ int main()
 
     // cout << prodOfOneToNWithStepK(10, 2) << endl;
 
-    cout << sumOfDigitsOfNInBaseK(123, 10) << endl;
+    // cout << sumOfDigitsOfNInBaseK(123, 10) << endl;
 
     return 0;
 }
