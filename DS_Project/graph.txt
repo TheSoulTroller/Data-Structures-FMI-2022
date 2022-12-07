@@ -1,0 +1,20 @@
+Sofia:
+Plovdiv,250
+Burgas,500
+Varna,500
+Ruse,400
+Stara Zagora,400
+Plovdiv:
+Burgas,250
+Varna,350
+Ruse,250
+Stara Zagora,70
+Burgas:
+Varna,100
+Ruse,150
+Stara Zagora,270
+Varna:
+Ruse,100
+Stara Zagora,220
+Ruse:
+Stara Zagora,120
