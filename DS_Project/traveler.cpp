@@ -2,13 +2,17 @@
 
 int main()
 {
-    std::string command;
-    do
-    {
-        std::cout << ">";
-        std::cin >> command;
-    }
-    while(Interpretator::interpretate(command);
+    Graph graph("graph.txt");
+    cout << "Printing graph:\n";
+    graph.printGraph();
 
-    return 0;
+    // std::string command;
+    // do
+    // {
+    //     std::cout << ">";
+    //     std::cin >> command;
+    // }
+    // while(Interpretator::interpretate(command));
+
+    // return 0;
 }

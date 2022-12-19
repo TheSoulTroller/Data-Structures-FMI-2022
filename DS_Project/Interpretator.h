@@ -7,26 +7,22 @@
 class Interpretator {
     Graph graph;
 public:
-    static bool interpretate(std::string command, Graph graph) {
+    static bool interpretate(const std::string& command,const Graph& graph) {
         if(command == "exit") return false;
         if(command.substr(0, 4) == "load")
         {
-            graph = Graph(command.substr(5, command.length() - 5));
+            // graph = Graph(command.substr(5, command.length() - 5));
         }
         if (command == "print") {
             // graph.print();
             return true;
         }
-        if (command == "Dijkstra") {
-            Node* begin = graph.begin();
-            Algorithms::Dijkstra(graph,begin);
-            return true;
-        }
         if (command == "Ant Algorithm") {
-            Algorithms::Dijkstra(graph);
+            // Node* begin = graph.chooseBegining();
+            // Algorithms::antAlgorithm(graph,begin);
             return true;
         }
-        
+        return true;
     }
 private:
 
