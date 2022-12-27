@@ -17,6 +17,7 @@ struct Node {
 
 class Graph {
 private:
+    Node* start;
     std::vector<Node> nodes;
 
     std::vector<std::string> generateAllEdges(std::string& line) {
@@ -52,9 +53,33 @@ private:
         return 0;
     }
 
+    int lastDistance(const std::string& city1, const std::string& city2) {
+        // cout << "City1: " << city1 << " , " << "City2: " << city2 << endl;
+        for(int i = 0; i < nodes.size(); i++) {
+            if(nodes[i].name == city1)
+            {
+               for(int j = 0; j < nodes[i].neighbors.size(); j++) {
+                    if(nodes[i].neighbors[j]->name == city2)
+                    {
+                        return nodes[i].length[j];
+                    }
+               }
+            }
+        }
+        return (-1 * INT32_MAX);
+    }
+
     std::string strToName(const std::string& line) {
         if(line[line.length()-1] == '{') return line.substr(0, line.length()-2);
         return line.substr(firstLetter(line), line.find(',') - firstLetter(line));
+    }
+
+    void validateDistance(int& distance) {
+        cin >> distance;
+        while (distance < 0) { 
+            cout << "Distance can NOT be negative! Enter a distance: ";
+            cin >> distance;
+        }
     }
 
     void getAllNeighbors(Node& mainNode, std::ifstream& readFile) {
@@ -68,10 +93,42 @@ private:
     }
 
     Node& findNode(const std::string& line) {
+        // cout << "findNode line = " << line << endl;
         for (int i = 0; i < nodes.size(); i++) {
-            if (nodes[i].name == line) return nodes[i];
+            if (nodes[i].name == line)
+            {
+                // cout << "Found: " << nodes[i].name << endl;
+                return nodes[i];
+            } 
         }
+        cout << line << " Not Found!!!" << endl;
         return nodes[0];
+    }
+
+    bool isVisited(const std::string& city, const std::vector<std::string>& list) {
+        for(int i = 0; i < list.size(); i++)
+        {
+            if(list[i] == city) return true;
+        }
+        return false;
+    }
+
+    void findClosestNeighbour(Node*& current, const std::vector<std::string>& visited, int& pathLength) {
+        int minLength = INT32_MAX;
+        Node* newCity = nullptr;
+        assert(current->length.size() != current->neighbors.size());
+        for(int i = 0; i < current->length.size(); i++)
+        {
+            // cout << current->neighbors[i]->name << " " << current->length[i] << endl;
+            if(!isVisited(current->neighbors[i]->name, visited) && minLength > current->length[i])
+            {
+                minLength = current->length[i];
+                newCity = &findNode(current->neighbors[i]->name);
+            }
+        }
+        assert(newCity != nullptr);
+        pathLength += minLength;
+        current = newCity;
     }
 
 public:
@@ -102,9 +159,44 @@ public:
                 
             }
         }
+
+        // by default the first city will be the starting city
+        this->start = &nodes[0];
+
+        readFile.close();
     }
 
-    void printGraph() {
+    void chooseCity(const std::string& cityName) {
+        for(int i = 0; i < nodes.size(); i++) {
+            if(nodes[i].name == cityName) {
+                this->start = &nodes[i];
+                return;
+            }
+        }
+        cout << cityName << " was not found in the current graph." << endl;
+    }
+
+    void addCity(const std::string& cityName)
+    {
+        Node newCity(cityName);
+        nodes.push_back(newCity);
+        for(int i = 0; i < nodes.size() - 1; i++) {
+            cout << "Enter distance from " << nodes[i].name << " to " << cityName << endl;
+            int distance;
+            validateDistance(distance);
+
+            Node* ptrToOldCity = &findNode(nodes[i].name);
+            newCity.neighbors.push_back(ptrToOldCity);
+            newCity.length.push_back(distance);
+
+            Node* ptrToNewCity = &findNode(cityName);
+            newCity.neighbors.push_back(ptrToNewCity);
+            newCity.length.push_back(distance);
+        }
+        
+    }
+
+    void printGraph() const {
         for(int i = 0; i < nodes.size(); i++) {
             cout << "Current city: " << nodes[i].name << " -> ";
             for(int j = 0; j < nodes[i].neighbors.size(); j++) {
@@ -112,5 +204,39 @@ public:
             }
             cout << "nullptr" << endl;
         }    
+    }
+
+    void findShortestPath() {
+        // callculate all possible paths and choose the shortest
+        // (n-1)!/2                
+    }
+
+    void aStar() {
+        // TO DO:
+
+    }
+
+    void antColonyOptimization() {
+        std::vector<std::string> path;
+        int pathLength = 0;
+        path.push_back(start->name);
+        while(path.size() != nodes.size())
+        {
+            findClosestNeighbour(start,path,pathLength);
+            path.push_back(start->name);
+        }
+        path.push_back(path[0]);
+
+        pathLength += lastDistance(path[path.size() - 1], path[path.size() - 2]);
+
+        // print path
+        for(int i = 0; i < path.size(); i++)
+        {
+            cout << path[i] << " -> ";
+        }
+        cout << "End" << endl << "Distance: " << pathLength << " km.\n";
+
+        // set start to point at the right city
+        this->start = &findNode(path[0]);
     }
 };

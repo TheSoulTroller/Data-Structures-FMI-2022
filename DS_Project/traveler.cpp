@@ -3,8 +3,9 @@
 int main()
 {
     Graph graph("graph.txt");
-    cout << "Printing graph:\n";
-    graph.printGraph();
+    // cout << "Printing graph:\n";
+    // graph.printGraph();
+    graph.antColonyOptimization();
 
     // std::string command;
     // do
