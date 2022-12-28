@@ -54,19 +54,33 @@ private:
     }
 
     int lastDistance(const std::string& city1, const std::string& city2) {
-        // cout << "City1: " << city1 << " , " << "City2: " << city2 << endl;
+        for(int i = 0; i < nodes.size(); i++)
+            cout << nodes[i].name << " ";
         for(int i = 0; i < nodes.size(); i++) {
             if(nodes[i].name == city1)
             {
                for(int j = 0; j < nodes[i].neighbors.size(); j++) {
+                    // cout << nodes[i].neighbors[j]->name << endl;
                     if(nodes[i].neighbors[j]->name == city2)
                     {
+                        // cout << "if2" << endl;
                         return nodes[i].length[j];
                     }
                }
             }
         }
-        return (-1 * INT32_MAX);
+        cout << "City1: " << city1 << " , " << "City2: " << city2 << endl;
+        return INT32_MIN;
+    }
+
+    int evaluatePath(const std::vector<Node>& path) {
+        int pathLength = 0;
+        for(int i = 0; i < path.size()-1; i++)
+        {
+            pathLength += lastDistance(path[i].name, path[i+1].name);
+        }
+        pathLength += lastDistance(path[path.size()-1].name, path[0].name);
+        return pathLength;
     }
 
     std::string strToName(const std::string& line) {
@@ -116,7 +130,7 @@ private:
     void findClosestNeighbour(Node*& current, const std::vector<std::string>& visited, int& pathLength) {
         int minLength = INT32_MAX;
         Node* newCity = nullptr;
-        assert(current->length.size() != current->neighbors.size());
+        assert(current->length.size() == current->neighbors.size());
         for(int i = 0; i < current->length.size(); i++)
         {
             // cout << current->neighbors[i]->name << " " << current->length[i] << endl;
@@ -129,6 +143,67 @@ private:
         assert(newCity != nullptr);
         pathLength += minLength;
         current = newCity;
+    }
+
+    void print(std::vector<Node> nodes)
+    {
+        cout << "-----------------------\n";
+        for(int i = 0; i < nodes.size(); i++)
+        {
+            cout << nodes[i].name << " ";
+        }
+        cout << "\n-----------------------\n";
+    }
+
+    void generatePathsUtil(std::vector<Node> nodes, std::vector<Node> path, std::vector<bool> visited, std::vector<std::vector<Node>>& allPaths, int size) {
+        // if all the nodes are visited, then add the path to the list of all paths
+        if (path.size() == size) {
+            allPaths.push_back(path);
+            return;
+        }
+
+        // for each node, if it is not visited, then add it to the path and mark it as visited
+        for (int i = 0; i < size; i++) {
+            if (!visited[i]) {
+                visited[i] = true;
+                path.push_back(nodes[i]);
+                generatePathsUtil(nodes, path, visited, allPaths, size);
+                visited[i] = false;
+                path.pop_back();
+            }
+        }
+    }
+
+    void generatePaths(std::vector<Node> nodes, int size) {
+        // // generate all possible permutations of the nodes
+        // std::vector<std::vector<Node>> allPaths;
+        // std::vector<Node> path;
+        // std::vector<bool> visited(size, false);
+        // generatePathsUtil(nodes, path, visited, allPaths, size);
+
+        // // print allPaths
+        // int minPathLength = INT32_MAX;
+        // for(int i = 0; i < allPaths.size(); i++)
+        // {
+        //     int currentPathLength = evaluatePath(allPaths[i]);
+        //     if(minPathLength > currentPathLength)
+        //     {
+        //         minPathLength = currentPathLength;
+        //         print(allPaths[i]);
+        //     } 
+        // }
+
+        // generate path using heap algorithm
+        if(size == 1) {
+            cout << evaluatePath(nodes) << endl;
+            // print(nodes);
+        } else {
+            for(int i = 0; i < size; i++) {
+                generatePaths(nodes, size-1);
+                int swapIndex = (size % 2 == 0) ? i : 0;
+                std::swap(nodes[swapIndex], nodes[size-1]);
+            }
+        }
     }
 
 public:
@@ -164,6 +239,8 @@ public:
         this->start = &nodes[0];
 
         readFile.close();
+
+        assert(nodes.size() >= 3);
     }
 
     void chooseCity(const std::string& cityName) {
@@ -208,7 +285,9 @@ public:
 
     void findShortestPath() {
         // callculate all possible paths and choose the shortest
-        // (n-1)!/2                
+        // (n-1)!/2
+        std::swap(nodes[0], nodes[nodes.size()-1]);
+        generatePaths(nodes, nodes.size()-1);           
     }
 
     void aStar() {

@@ -2,10 +2,11 @@
 
 int main()
 {
-    Graph graph("graph.txt");
+    Graph graph("graph2.txt");
     // cout << "Printing graph:\n";
     // graph.printGraph();
-    graph.antColonyOptimization();
+    // graph.antColonyOptimization();
+    graph.findShortestPath();
 
     // std::string command;
     // do
