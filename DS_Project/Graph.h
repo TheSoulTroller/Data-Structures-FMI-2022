@@ -359,7 +359,48 @@ public:
         generatePaths(nodes, nodes.size() - 1);
     }
 
-        
+    void farthestInsertion() {
+    cout << start->name << endl;
+    std::vector<Node*> tour {start};
+    std::unordered_set<Node*, NodeHash, NodeEqual> unvisited_nodes;
+    for (Node& node : nodes) {
+      unvisited_nodes.insert(&node);
+    }
+    unvisited_nodes.erase(start);
+
+    while (!unvisited_nodes.empty())
+    {
+        Node* farthest_node = nullptr;
+        int farthest_distance = 0;
+        for (Node* node : unvisited_nodes)
+        {
+            int distance = INT32_MAX;
+            for (Node* tour_node : tour)
+            {
+                distance = std::min(distance, distanceBetween(*node, *tour_node));
+            }
+            if (distance > farthest_distance)
+            {
+                farthest_node = node;
+                farthest_distance = distance;
+            }
+        }
+
+        int closest_distance = INT32_MAX;
+        int insert_before = 0;
+        for (int i = 1; i < tour.size(); ++i)
+        {
+            int distance = distanceBetween(*tour[i - 1], *farthest_node) +
+                           distanceBetween(*farthest_node, *tour[i]) -
+                           distanceBetween(*tour[i - 1], *tour[i]);
+            if (distance < closest_distance)
+            {
+                closest_distance = distance;
+                insert_before = i;
+            }
+        }
+    }
+    }
 
     void nearestNeighbour() {
         std::vector<std::string> path;
