@@ -6,22 +6,22 @@
 using namespace std::chrono;
 class Algorithms {
 public:
-    static void antAlgorithm(Graph& graph) {
-        std::cout << "Ant Algorithm performing..." << std::endl;  
+    static void nearestNeighbour(Graph& graph) {
+        cout << "Nearest Neighbour Algorithm performing..." << endl;  
         std::chrono::high_resolution_clock::time_point start = high_resolution_clock::now();
-        graph.antColonyOptimization();
+        graph.nearestNeighbour();
         std::chrono::high_resolution_clock::time_point end = high_resolution_clock::now();
         const long long duration = duration_cast<milliseconds>(end - start).count();
-        std::cout << "Ant Algorithm finished in " << duration << " milliseconds" << std::endl;
+        cout << "Nearest Neighbour Algorithm finished in " << duration << " milliseconds" << endl;
     }
 
-    static void aStarAlgorithm(Graph& graph) {
-        std::cout << "A* Algorithm performing..." << std::endl;
+    static void farthestInsertion(Graph& graph) {
+        cout << "Farthest Insertion Algorithm performing..." << endl;
         std::chrono::high_resolution_clock::time_point start = high_resolution_clock::now();
-        graph.aStar();
+        graph.farthestInsertion();
         std::chrono::high_resolution_clock::time_point end = high_resolution_clock::now();
         const long long duration = duration_cast<milliseconds>(end - start).count();
-        std::cout << "A* Algorithm finished in " << duration << " milliseconds" << std::endl;
+        cout << "Farthest Insertion Algorithm finished in " << duration << " milliseconds" << endl;
     }
 
 };

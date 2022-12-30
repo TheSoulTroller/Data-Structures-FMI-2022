@@ -16,7 +16,7 @@ public:
             graph.printGraph();
             return true;
         }
-        if (command == "Ant Algorithm") {
+        if (command == "nn" || command == "Nearest Neighbor" || command == "nearest neighbour") {
 
             cout << "Choose a city to start from: ";
             std::string city;
@@ -24,30 +24,31 @@ public:
 
             graph.chooseCity(city);
 
-            Algorithms::antAlgorithm(graph);
+            Algorithms::nearestNeighbour(graph);
 
             return true;
         }
-        if(command == "A* Algorithm") {
+        if(command == "Farthest Insertion" || command == "farthest insertion" || command == "fi") {
             cout << "Choose a city to start from: ";
             std::string city;
             cin >> city;
 
             graph.chooseCity(city);
 
-            Algorithms::aStarAlgorithm(graph);
+            Algorithms::farthestInsertion(graph);
 
             return true;
         }
         if(command == "help")
         {
-            std::cout << "load <filename> - loads a graph from a file" << std::endl;
-            std::cout << "print - prints the graph" << std::endl;
-            std::cout << "Ant Algorithm - runs the Ant Algorithm" << std::endl;
-            std::cout << "exit - exits the program" << std::endl;
+            cout << "load <filename> - loads a graph from a file" << endl;
+            cout << "print - prints the graph" << endl;
+            cout << "Nearest Neighbour Algorithm" << endl;
+            cout << "Farthest Insertion Algorithm" << endl;
+            cout << "exit - exits the program" << endl;
             return true;
         }
-        std::cout << "Invalid command! Type 'help' for a list of commands." << std::endl;
+        cout << "Invalid command! Type 'help' for a list of commands." << endl;
         return true;
     }
 private:
