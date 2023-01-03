@@ -1,10 +1,12 @@
 #pragma once
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include <vector>
 #include <unordered_set>
 #include <functional>
 #include <fstream>
+#include <cassert>
 
 using namespace std;
 struct Node
@@ -110,17 +112,17 @@ private:
         return 0;
     }
 
-    int tourLength(const std::vector<Node> &tour) const {
+    int tourLength(const std::vector<Node*> &tour) const {
         int length = 0;
-        assert(tour[0].neighbors.size() > 0);
+        assert(tour[0]->neighbors.size() > 0);
         for (int i = 0; i < tour.size() - 1; ++i)
         {
-            cout << "dis: " << tour[i].name << " " << tour[i+1].name << " -> " << distanceBetween(tour[i], tour[i + 1]) << endl;
-            length += distanceBetween(tour[i], tour[i + 1]);
+            //cout << "dis: " << tour[i]->name << " " << tour[i+1]->name << " -> " << distanceBetween(*tour[i], *tour[i + 1]) << endl;
+            length += distanceBetween(*tour[i], *tour[i + 1]);
         }
-        cout << distanceBetween(tour.back(), tour.front()) << endl;
-        length += distanceBetween(tour.back(), tour.front());
-        assert(length <= 0);
+        //cout << distanceBetween(*tour.back(), *tour.front()) << endl;
+        length += distanceBetween(*tour.back(), *tour.front());
+        assert(length > 0);
         return length;
     }
 
@@ -128,11 +130,14 @@ private:
         assert(&a != &b);
         for (int i = 0; i < a.neighbors.size(); ++i)
         {
+            //cout << a.neighbors[i]->name << endl;
             if (a.neighbors[i]->name == b.name)
             {
+                //cout << a.neighbors.size() << " " << a.name << " " << b.name << endl;
                 return a.length[i];
             }
         }
+        cout << a.neighbors.size() << " " << a.name << " " << b.name << endl;
         return INT32_MIN;
     }
 
@@ -155,13 +160,13 @@ private:
         return INT32_MIN;
     }
 
-    int evaluatePath(const std::vector<Node> &path) {
+    int evaluatePath(const std::vector<Node*> &path) {
         int pathLength = 0;
         for (int i = 0; i < path.size() - 1; i++)
         {
-            pathLength += distanceBetween(path[i], path[i + 1]);
+            pathLength += distanceBetween(*path[i], *path[i + 1]);
         }
-        pathLength += distanceBetween(path[path.size() - 1], path[0]);
+        pathLength += distanceBetween(*path[path.size() - 1], *path[0]);
         return pathLength;
     }
 
@@ -235,36 +240,16 @@ private:
         }
     }
 
-    void generatePaths(std::vector<Node> nodes, int size) {
-        // // generate all possible permutations of the nodes
-        // std::vector<std::vector<Node>> allPaths;
-        // std::vector<Node> path;
-        // std::vector<bool> visited(size, false);
-        // generatePathsUtil(nodes, path, visited, allPaths, size);
-
-        // // print allPaths
-        // int minPathLength = INT32_MAX;
-        // for(int i = 0; i < allPaths.size(); i++)
-        // {
-        //     int currentPathLength = evaluatePath(allPaths[i]);
-        //     if(minPathLength > currentPathLength)
-        //     {
-        //         minPathLength = currentPathLength;
-        //         print(allPaths[i]);
-        //     }
-        // }
-
-        // generate path using heap algorithm
+    void generatePaths(std::vector<Node*> nodes, int size, vector<int>& results) {
         if (size == 1)
         {
-            cout << evaluatePath(nodes) << endl;
-            // print(nodes);
+            results.push_back(evaluatePath(nodes));
         }
         else
         {
             for (int i = 0; i < size; i++)
             {
-                generatePaths(nodes, size - 1);
+                generatePaths(nodes, size - 1, results);
                 int swapIndex = (size % 2 == 0) ? i : 0;
                 std::swap(nodes[swapIndex], nodes[size - 1]);
             }
@@ -273,7 +258,7 @@ private:
 
 public:
     Graph(const std::string &filename) {
-        std::ifstream readFile(filename, std::ios::in);
+        std::ifstream readFile(filename);
         std::string line;
 
         // the first line has all the cities
@@ -306,7 +291,7 @@ public:
 
         readFile.close();
 
-        assert(nodes.size() >= 3);
+        //assert(nodes.size() >= 3);
     }
 
     void chooseCity(const std::string &cityName) {
@@ -355,51 +340,69 @@ public:
     void findShortestPath() {
         // callculate all possible paths and choose the shortest
         // (n-1)!/2
-        std::swap(nodes[0], nodes[nodes.size() - 1]);
-        generatePaths(nodes, nodes.size() - 1);
+        //std::swap(nodes[0], nodes[nodes.size() - 1]);
+        vector<Node*> temp;
+        temp.resize(nodes.size());
+        for (int i = 0; i < nodes.size(); ++i) {
+            temp[i] = &nodes[i];
+        }
+        std::swap(temp[0], temp[temp.size() - 1]);
+        vector<int> results;
+        generatePaths(temp, temp.size() - 1, results);
+        cout << *min_element(results.begin(), results.end()) << endl;
     }
 
     void farthestInsertion() {
-    cout << start->name << endl;
-    std::vector<Node*> tour {start};
-    std::unordered_set<Node*, NodeHash, NodeEqual> unvisited_nodes;
-    for (Node& node : nodes) {
-      unvisited_nodes.insert(&node);
-    }
-    unvisited_nodes.erase(start);
-
-    while (!unvisited_nodes.empty())
-    {
-        Node* farthest_node = nullptr;
-        int farthest_distance = 0;
-        for (Node* node : unvisited_nodes)
-        {
-            int distance = INT32_MAX;
-            for (Node* tour_node : tour)
-            {
-                distance = std::min(distance, distanceBetween(*node, *tour_node));
-            }
-            if (distance > farthest_distance)
-            {
-                farthest_node = node;
-                farthest_distance = distance;
-            }
+        cout << start->name << endl;
+        std::vector<Node*> tour {start};
+        std::unordered_set<Node*, NodeHash, NodeEqual> unvisitedNodes;
+        for (Node& node : nodes) {
+          unvisitedNodes.insert(&node);
         }
+        unvisitedNodes.erase(start);
 
-        int closest_distance = INT32_MAX;
-        int insert_before = 0;
-        for (int i = 1; i < tour.size(); ++i)
+        while (!unvisitedNodes.empty())
         {
-            int distance = distanceBetween(*tour[i - 1], *farthest_node) +
-                           distanceBetween(*farthest_node, *tour[i]) -
-                           distanceBetween(*tour[i - 1], *tour[i]);
-            if (distance < closest_distance)
+            Node* farthestNode = nullptr;
+            int farthestDistance = 0;
+            for (Node* node : unvisitedNodes)
             {
-                closest_distance = distance;
-                insert_before = i;
+                int distance = INT32_MAX;
+                for (Node* tour_node : tour)
+                {
+                    distance = std::min(distance, distanceBetween(*node, *tour_node));
+                }
+                if (distance > farthestDistance)
+                {
+                    farthestNode = node;
+                    farthestDistance = distance;
+                }
             }
+
+            int closestDistance = INT32_MAX;
+            int insertIndex = 0;
+            for (int i = 1; i < tour.size(); ++i)
+            {
+                int distance = distanceBetween(*tour[i - 1], *farthestNode) +
+                               distanceBetween(*farthestNode, *tour[i]) -
+                               distanceBetween(*tour[i - 1], *tour[i]);
+                
+                if (distance < closestDistance)
+                {
+                    closestDistance = distance;
+                    insertIndex = i;
+                }
+            }
+
+            tour.insert(tour.begin() + insertIndex, farthestNode);
+            unvisitedNodes.erase(farthestNode);
         }
-    }
+        
+        for (Node* n : tour) {
+            cout << n->name << " -> ";
+        }
+        cout << "End" << endl
+             << "Distance: " << tourLength(tour) << " km.\n";
     }
 
     void nearestNeighbour() {
@@ -416,9 +419,9 @@ public:
         pathLength += distanceBetween(path[path.size() - 1], path[path.size() - 2]);
 
         // print path
-        for (int i = 0; i < path.size(); i++)
+        for(string city : path)
         {
-            cout << path[i] << " -> ";
+            cout << city << " -> ";
         }
         cout << "End" << endl
              << "Distance: " << pathLength << " km.\n";
