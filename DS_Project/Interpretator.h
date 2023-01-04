@@ -10,10 +10,15 @@ public:
         if(command == "exit") return false;
         if(command.substr(0, 4) == "load")
         {
-            graph = Graph(command.substr(5, command.length() - 5));
+            graph = Graph(command.substr(5, command.length()));
+            return true;
         }
-        if (command == "print") {
+        if(command == "print") {
             graph.printGraph();
+            return true;
+        }
+        if(command.substr(0,4) == "save") {
+            graph.saveToFile(command.substr(5, command.length()));
             return true;
         }
         if (command == "nn" || command == "Nearest Neighbor" || command == "nearest neighbour") {

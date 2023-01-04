@@ -69,7 +69,8 @@ private:
     std::string strToName(const std::string &line) {
         if (line[line.length() - 1] == '{')
             return line.substr(0, line.length() - 2);
-        return line.substr(firstLetterIndex(line), line.find(',') - firstLetterIndex(line));
+        // cout << firstLetterIndex(line) << " " << line.substr(firstLetterIndex(line), line.find(',') ) << endl;
+        return line.substr(firstLetterIndex(line), line.find(',') - 1);
     }
 
     Node &findNode(const std::string &line) {
@@ -82,7 +83,7 @@ private:
                 return nodes[i];
             }
         }
-        cout << line << " Not Found!!!" << endl;
+        // cout << line << " Not Found!!!" << endl;
         return nodes[0];
     }
 
@@ -106,10 +107,10 @@ private:
     int firstLetterIndex(const std::string &line) const {
         for (int i = 0; i < line.length(); i++)
         {
-            if (line[i] != ' ')
+            if (line[i] != ' ' && line[i] != '\t')
                 return i;
         }
-        return 0;
+        return -1;
     }
 
     int tourLength(const std::vector<Node*> &tour) const {
@@ -181,7 +182,7 @@ private:
 
     void getAllNeighbors(Node &mainNode, std::ifstream &readFile) {
         std::string line;
-        while (getline(readFile, line))
+        while  (getline(readFile, line))
         {
             if (line == "}")
                 return;
@@ -258,7 +259,26 @@ private:
 
 public:
     Graph(const std::string &filename) {
+        // cheking filename validity
+        assert(filename.size() > 0);
+        assert(filename.find(".txt") != std::string::npos);
+
         std::ifstream readFile(filename);
+        if(!readFile.is_open())
+        {
+            cout << "File not found!\n";
+            return;
+        }
+        if(readFile.peek() == std::ifstream::traits_type::eof())
+        {
+            cout << "File is empty!\n";
+            return;
+        }
+        if(!readFile.good())
+        {
+            cout << "File is corrupted!\n";
+            return;
+        }
         std::string line;
 
         // the first line has all the cities
@@ -272,6 +292,12 @@ public:
             nodes.push_back(node);
         }
 
+        for(Node& node: nodes)
+        {
+            cout << node.name << "|";
+        }
+        cout << endl;
+
         // the rest of the file has the connections between the cities an their length
         while (readFile)
         {
@@ -280,6 +306,7 @@ public:
             {
                 // find the current city
                 Node &currentNode = findNode(strToName(line));
+                // cout << "Current city for getAllNeighbors: " << currentNode.name << "\n";
 
                 // get all the neighbors of the current city
                 getAllNeighbors(currentNode, readFile);
@@ -425,5 +452,36 @@ public:
 
         // set start to point at the right city
         this->start = &findNode(path[0]);
+    }
+
+    void saveToFile(const string& fileName) const {
+        // check if the string has the .txt extension
+        string file = fileName;
+        if (fileName.find(".txt") == string::npos)
+        {
+            file += ".txt";
+        }
+        ofstream write(file);
+        if (!write)
+        {
+            cout << "Error opening file " << file << endl;
+            return;
+        }
+        for(int i = 0; i < nodes.size() - 1; i++)
+        {
+            write << nodes[i].name << ", ";
+        }
+        write << nodes[nodes.size() - 1].name << "\n";
+        for (Node node : nodes)
+        {
+            write << node.name << " {\n";
+            for (int i = 0; i < node.neighbors.size(); i++)
+            {
+                write << "\t" << node.neighbors[i]->name << "," << node.length[i] << "\n";
+            }
+            write << "}\n";
+        }
+
+        write.close();
     }
 };
