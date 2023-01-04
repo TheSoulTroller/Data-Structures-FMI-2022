@@ -338,17 +338,14 @@ public:
     }
 
     void findShortestPath() {
-        // callculate all possible paths and choose the shortest
-        // (n-1)!/2
-        //std::swap(nodes[0], nodes[nodes.size() - 1]);
-        vector<Node*> temp;
-        temp.resize(nodes.size());
+        vector<Node*> path;
+        path.resize(nodes.size());
         for (int i = 0; i < nodes.size(); ++i) {
-            temp[i] = &nodes[i];
+            path[i] = &nodes[i];
         }
-        std::swap(temp[0], temp[temp.size() - 1]);
+        std::swap(path[0], path[path.size() - 1]);
         vector<int> results;
-        generatePaths(temp, temp.size() - 1, results);
+        generatePaths(path, path.size() - 1, results);
         cout << *min_element(results.begin(), results.end()) << endl;
     }
 
