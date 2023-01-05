@@ -1,27 +1,26 @@
 #pragma once
 #include <chrono>
 #include "Graph.h"
-#include "iostream"
-
-using namespace std::chrono;
+#include "Timer.h"
+#include "MemoryTracker.h"
 class Algorithms {
 public:
     static void nearestNeighbour(Graph& graph) {
         cout << "Nearest Neighbour Algorithm performing..." << endl;  
-        std::chrono::high_resolution_clock::time_point start = high_resolution_clock::now();
+        Timer();
+        MemoryTracker* ptr = new MemoryTracker();
         graph.nearestNeighbour();
-        std::chrono::high_resolution_clock::time_point end = high_resolution_clock::now();
-        const long long duration = duration_cast<milliseconds>(end - start).count();
-        cout << "Nearest Neighbour Algorithm finished in " << duration << " milliseconds" << endl;
+        delete ptr;
+        Timer().stop("Nearest Neighbour Algorithm");
     }
 
     static void farthestInsertion(Graph& graph) {
         cout << "Farthest Insertion Algorithm performing..." << endl;
-        std::chrono::high_resolution_clock::time_point start = high_resolution_clock::now();
+        Timer();
+        MemoryTracker* ptr = new MemoryTracker();
         graph.farthestInsertion();
-        std::chrono::high_resolution_clock::time_point end = high_resolution_clock::now();
-        const long long duration = duration_cast<milliseconds>(end - start).count();
-        cout << "Farthest Insertion Algorithm finished in " << duration << " milliseconds" << endl;
+        delete ptr;
+        Timer().stop("Farthest Insertion Algorithm");
     }
 
 };
